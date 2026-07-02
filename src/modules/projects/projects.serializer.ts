@@ -4,13 +4,9 @@ import type {
   ProjectFuturePlan,
   ProjectLinks,
   ProjectTechnology,
-} from '@prisma/client';
+} from "@prisma/client";
 
-import type {
-  LegacyProject,
-  LegacyProjectLinks,
-  LegacyProjectTechnology,
-} from '../../types';
+import type { LegacyProject, LegacyProjectLinks, LegacyProjectTechnology } from "../../types";
 
 /**
  * Project serializer (README §3.5).
@@ -37,9 +33,9 @@ export function serializeProject(project: ProjectWithRelations): LegacyProject {
   }));
 
   const links: LegacyProjectLinks = {
-    live: project.links?.live ?? '#',
-    clientRepo: project.links?.clientRepo ?? '',
-    serverRepo: project.links?.serverRepo ?? '',
+    live: project.links?.live ?? "#",
+    clientRepo: project.links?.clientRepo ?? "",
+    serverRepo: project.links?.serverRepo ?? "",
   };
 
   // Challenges and future plans are stored as ordered rows; emit as string[].
@@ -59,6 +55,8 @@ export function serializeProject(project: ProjectWithRelations): LegacyProject {
     image: project.image,
     briefDescription: project.briefDescription,
     content: project.content,
+    published: project.published,
+    order: project.order,
     technologies,
     links,
     challengesFaced,

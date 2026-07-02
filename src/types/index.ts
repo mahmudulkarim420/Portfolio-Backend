@@ -4,7 +4,7 @@
  * These mirror the frontend "legacy" read shapes (README §2.4) so that API
  * responses are drop-in compatible with the existing frontend types.
  */
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from "express";
 
 // ---------------------------------------------------------------------------
 // Auth / session
@@ -51,6 +51,8 @@ export interface LegacyProject {
   links: LegacyProjectLinks;
   challengesFaced: string[];
   futurePlans: string[];
+  order?: number;
+  published?: boolean;
 }
 
 export interface LegacySkill {
@@ -178,7 +180,7 @@ export class AppError extends Error {
     isOperational = true,
   ) {
     super(message);
-    this.name = 'AppError';
+    this.name = "AppError";
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     this.errors = errors;
@@ -187,8 +189,4 @@ export class AppError extends Error {
 }
 
 /** Convenience typed handler to avoid repetitive try/catch in controllers. */
-export type AsyncHandler = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => Promise<unknown>;
+export type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<unknown>;
