@@ -34,7 +34,7 @@ const orderSchema = z.coerce.number().int().min(0, 'Order must be at least 0').o
 
 const technologySchema = z.object({
   name: z.string().min(1, 'Technology name is required'),
-  fullWidth: z.boolean().default(false),
+  fullWidth: z.coerce.boolean().default(false),
 });
 
 const linksSchema = z.object({
