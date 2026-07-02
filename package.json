@@ -2,11 +2,11 @@
   "name": "mahmudul-karim-portfolio-backend",
   "version": "1.0.0",
   "description": "Backend API for Mahmudul Karim Portfolio (Node.js + Express + TypeScript + Prisma + PostgreSQL)",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "lint": "eslint .",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
