@@ -1,0 +1,185 @@
+// Prisma schema for Mahmudul Karim Portfolio backend.
+// Mirrors the legacy frontend read shapes so API responses map 1:1 to the frontend types.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum SkillCategory {
+  FRONTEND_DEVELOPMENT
+  BACKEND_DEVELOPMENT
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+// ---------------------------------------------------------------------------
+// Auth — single admin account (seeded, no public sign-up)
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  messages Message[] // messages read by this admin (optional relation)
+}
+
+// ---------------------------------------------------------------------------
+// Profile — singleton (one row, id = "singleton")
+// ---------------------------------------------------------------------------
+
+model Profile {
+  id        String   @id @default("singleton")
+  name      String
+  title     String
+  bio       String   @db.Text
+  email     String
+  phone     String
+  location  String
+  github    String   @default("")
+  linkedin  String   @default("")
+  twitter   String   @default("")
+  website   String   @default("")
+  avatar    String   @default("")
+  resumeUrl String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Skills
+// ---------------------------------------------------------------------------
+
+model Skill {
+  id          String        @id @default(cuid())
+  name        String
+  category    SkillCategory
+  level       SkillLevel    @default(BEGINNER)
+  proficiency Int           @default(0) // 0–100, source of truth
+  icon        String        @default("FiCode") // react-icons component name
+  order       Int           @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category, order])
+}
+
+// ---------------------------------------------------------------------------
+// Experiences
+// ---------------------------------------------------------------------------
+
+model Experience {
+  id          String   @id @default(cuid())
+  role        String
+  company     String
+  startDate   String // free-text month/year, e.g. "Dec 2025"
+  endDate     String // free-text, e.g. "Mar 2026" or "Present"
+  period      String   @default("") // display string; derived if empty
+  description String   @db.Text
+  order       Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+}
+
+// ---------------------------------------------------------------------------
+// Projects
+// ---------------------------------------------------------------------------
+
+model Project {
+  id               String              @id @default(cuid())
+  slug             String              @unique
+  title            String
+  subtitle         String              @default("")
+  image            String              @default("")
+  briefDescription String              @default("")
+  content          String              @db.Text @default("") // rich text / markdown
+  published        Boolean             @default(false)
+  order            Int                 @default(0)
+
+  technologies ProjectTechnology[]
+  links        ProjectLinks?
+  challenges   ProjectChallenge[]
+  futurePlans   ProjectFuturePlan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+model ProjectTechnology {
+  id        String  @id @default(cuid())
+  name      String
+  fullWidth Boolean @default(false)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  @@index([projectId])
+}
+
+model ProjectLinks {
+  id         String  @id @default(cuid())
+  live       String  @default("#")
+  clientRepo String  @default("")
+  serverRepo String  @default("")
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId  String  @unique
+}
+
+model ProjectChallenge {
+  id        String  @id @default(cuid())
+  text      String
+  order     Int     @default(0)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  @@index([projectId, order])
+}
+
+model ProjectFuturePlan {
+  id        String  @id @default(cuid())
+  text      String
+  order     Int     @default(0)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  @@index([projectId, order])
+}
+
+// ---------------------------------------------------------------------------
+// Messages (contact form submissions)
+// ---------------------------------------------------------------------------
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  readBy   User?   @relation(fields: [readById], references: [id], onDelete: SetNull)
+  readById String?
+
+  @@index([createdAt])
+  @@index([read])
+}
