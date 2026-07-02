@@ -24,7 +24,7 @@ const categorySchema = z
   })
   .transform((val) => CATEGORY_DISPLAY_TO_ENUM[val]);
 
-const proficiencySchema = z
+const proficiencySchema = z.coerce
   .number()
   .int('Proficiency must be a whole number')
   .min(0, 'Proficiency must be at least 0')
@@ -36,7 +36,7 @@ export const createSkillSchema = z.object({
   category: categorySchema,
   proficiency: proficiencySchema,
   icon: z.string().min(1, 'Icon is required').default('FiCode'),
-  order: z.number().int().min(0, 'Order must be at least 0').default(0),
+  order: z.coerce.number().int().min(0, 'Order must be at least 0').default(0),
 });
 
 /** `PUT /api/skills/:id` — update a skill (all fields optional). */
@@ -45,7 +45,7 @@ export const updateSkillSchema = z.object({
   category: categorySchema.optional(),
   proficiency: proficiencySchema.optional(),
   icon: z.string().min(1, 'Icon is required').optional(),
-  order: z.number().int().min(0, 'Order must be at least 0').optional(),
+  order: z.coerce.number().int().min(0, 'Order must be at least 0').optional(),
 });
 
 export type CreateSkillInput = z.infer<typeof createSkillSchema>;

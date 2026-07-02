@@ -29,8 +29,8 @@ const contentSchema = z
   .string()
   .max(20000, 'Content must be at most 20000 characters')
   .optional();
-const publishedSchema = z.boolean().optional();
-const orderSchema = z.number().int().min(0, 'Order must be at least 0').optional();
+const publishedSchema = z.coerce.boolean().optional();
+const orderSchema = z.coerce.number().int().min(0, 'Order must be at least 0').optional();
 
 const technologySchema = z.object({
   name: z.string().min(1, 'Technology name is required'),
@@ -54,7 +54,7 @@ export const createProjectSchema = z.object({
   briefDescription: briefDescriptionSchema,
   content: contentSchema,
   published: publishedSchema,
-  order: z.number().int().min(0, 'Order must be at least 0').default(0),
+  order: z.coerce.number().int().min(0, 'Order must be at least 0').default(0),
   technologies: z.array(technologySchema).optional(),
   links: linksSchema.optional(),
   challengesFaced: stringArraySchema,

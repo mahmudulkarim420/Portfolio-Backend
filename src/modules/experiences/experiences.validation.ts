@@ -16,7 +16,7 @@ const descriptionSchema = z
   .min(1, 'Description is required')
   .max(2000, 'Description must be at most 2000 characters');
 const periodSchema = z.string().max(60, 'Period must be at most 60 characters').optional();
-const orderSchema = z.number().int().min(0, 'Order must be at least 0').default(0);
+const orderSchema = z.coerce.number().int().min(0, 'Order must be at least 0').default(0);
 
 /** `POST /api/experiences` — create an experience. */
 export const createExperienceSchema = z.object({
@@ -37,7 +37,7 @@ export const updateExperienceSchema = z.object({
   endDate: endDateSchema.optional(),
   period: periodSchema,
   description: descriptionSchema.optional(),
-  order: z.number().int().min(0, 'Order must be at least 0').optional(),
+  order: z.coerce.number().int().min(0, 'Order must be at least 0').optional(),
 });
 
 export type CreateExperienceInput = z.infer<typeof createExperienceSchema>;
