@@ -31,8 +31,9 @@ Thumbs.db
 prisma/migrations/dev.db
 prisma/migrations/dev.db-journal
 
-# Uploads (local fallback)
-uploads/
+# Uploads (local file storage fallback) — only ignore the top-level dir,
+# NOT src/uploads/ which contains the Cloudinary upload service.
+/uploads/
 
 # Coverage
 coverage/
