@@ -1,7 +1,7 @@
-import type { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
+import type { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 
-import { cloudinary } from '../config/cloudinary';
-import { AppError } from '../types';
+import { cloudinary } from "../config/cloudinary";
+import { AppError } from "../types";
 
 /**
  * Result of a successful Cloudinary upload.
@@ -27,7 +27,7 @@ export function uploadToCloudinary(
   buffer: Buffer,
   folder: string,
   filename: string,
-  resourceType: 'image' | 'raw' = 'image',
+  resourceType: "image" | "raw" = "image",
 ): Promise<CloudinaryUploadResult> {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -40,12 +40,7 @@ export function uploadToCloudinary(
       },
       (err?: UploadApiErrorResponse, result?: UploadApiResponse) => {
         if (err || !result) {
-          reject(
-            new AppError(
-              err?.message || 'Failed to upload file to Cloudinary.',
-              500,
-            ),
-          );
+          reject(new AppError(err?.message || "Failed to upload file to Cloudinary.", 500));
           return;
         }
         resolve({
@@ -69,7 +64,7 @@ export function uploadToCloudinary(
  */
 export async function deleteFromCloudinary(
   publicId: string | null | undefined,
-  resourceType: 'image' | 'raw' = 'image',
+  resourceType: "image" | "raw" = "image",
 ): Promise<void> {
   if (!publicId) {
     return;
@@ -88,12 +83,15 @@ export async function deleteFromCloudinary(
  * Example: https://res.cloudinary.com/demo/image/upload/v123/portfolio/avatar-abc.png
  *          → "portfolio/avatar-abc"
  */
-export function extractPublicIdFromUrl(url: string): string | null {
+export function extractPublicIdFromUrl(
+  url: string,
+  resourceType: "image" | "raw" = "image",
+): string | null {
   try {
     const parsed = new URL(url);
-    const parts = parsed.pathname.split('/');
+    const parts = parsed.pathname.split("/");
     // Remove the leading empty segment and the version segment ("v123").
-    const uploadIndex = parts.indexOf('upload');
+    const uploadIndex = parts.indexOf("upload");
     if (uploadIndex === -1) {
       return null;
     }
@@ -106,12 +104,14 @@ export function extractPublicIdFromUrl(url: string): string | null {
     if (!last) {
       return null;
     }
-    // Strip the file extension.
-    const dotIndex = last.lastIndexOf('.');
-    if (dotIndex > -1) {
-      relevant[relevant.length - 1] = last.slice(0, dotIndex);
+    // Strip the file extension only for images (raw resources need it in public_id)
+    if (resourceType === "image") {
+      const dotIndex = last.lastIndexOf(".");
+      if (dotIndex > -1) {
+        relevant[relevant.length - 1] = last.slice(0, dotIndex);
+      }
     }
-    return relevant.join('/');
+    return relevant.join("/");
   } catch {
     return null;
   }
